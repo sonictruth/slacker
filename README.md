@@ -4,7 +4,7 @@
 Slacker
 =======
 
-React Native Android application that user a backround job to keep your slack presence active.
+React Native Android application that uses a background job to keep your slack presence active.
 Also you have the option to send 'User is typing' when you get a private message or you are mentioned in a channel.
 
 ## Build and Install
