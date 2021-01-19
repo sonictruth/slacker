@@ -1,35 +1,48 @@
 import React from 'react';
+
 import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
   View,
   Text,
-  StatusBar,
-  TouchableOpacity,
+  Image,
+  Button,
+  StyleSheet,
   Linking,
+  TextInput,
+  Switch
 } from 'react-native';
+
+
 import BackgroundJob from 'react-native-background-actions';
-
-import { task, taskOptions } from './BackgroundTask';
-
-Linking.addEventListener('url', evt => console.log('xxx' + evt.url));
+import backgroundTask from './backgroundTask';
+import backgroundTaskDefaultOptions from './backgroundTaskDefaultOptions';
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      token: 'xoxp-7498168935-1631598236007-1647182461331-b363535cf7a5e94f4912e695381b53d1',
+      showTyping: true,
       serviceRunning: BackgroundJob.isRunning()
     };
+  }
+
+  getBackgroundTaskOptions() {
+    return {
+      parameters: {
+        token: this.token
+      },
+      ...backgroundTaskDefaultOptions
+    }
   }
 
   toggleBackground = async () => {
     if (!this.state.serviceRunning) {
       try {
-        console.log('Trying to start background service');
-        await BackgroundJob.start(task, taskOptions);
-        console.log('Successful start!');
+        await BackgroundJob.start(
+          backgroundTask,
+          this.getBackgroundTaskOptions()
+        );
         this.setState({
           serviceRunning: true
         });
@@ -37,42 +50,112 @@ class App extends React.Component {
         console.log('Error', e);
       }
     } else {
-      console.log('Stop background service');
       await BackgroundJob.stop();
       this.setState({
         serviceRunning: false
       });
     }
-
   };
+
   render() {
     this.playing = BackgroundJob.isRunning();
     return (
       <>
-        <SafeAreaView>
-          <Text style={{ fontSize: 30, textAlign: 'center', padding: 20 }}>
-            Slacker
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Image
+              style={styles.logo}
+              source={require('../icon.png')}
+            />
+            <Text style={styles.title}>
+              Slacker
           </Text>
-          <ScrollView contentInsetAdjustmentBehavior="automatic">
+          </View>
 
-            <View>
-              <TouchableOpacity
-                style={{ width: '100%', backgroundColor: 'gray' }}
-                onPress={this.toggleBackground}>
+          <View style={styles.spacer} />
 
-                <Text style={{ fontSize: 20, textAlign: 'center', padding: 20 }}>
+          <TextInput
+            placeholder={'Slack Token'}
+            textContentType={'password'}
+            secureTextEntry={true}
+            autoCorrect={false}
+            style={styles.input}
+            value={this.state.token}
+            onChangeText={
+              token => this.setState({ token })
+            }
+          />
 
-                  {this.state.serviceRunning ? 'Stop' : 'Start'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </SafeAreaView>
+          <View >
+
+            <Switch
+              onValueChange={
+                () => this.setState({ showTyping: !this.state.showTyping })
+              }
+              value={this.state.showTyping}
+            />
+            <Text>Show typing</Text>
+          </View>
+          <View style={styles.spacer} />
+          <Button
+            style={styles.button}
+            onPress={this.toggleBackground}
+            title={this.state.serviceRunning ? 'Stop' : 'Start'}
+            accessibilityLabel="Start Slacker service"
+          />
+
+          <View style={styles.spacer} />
+
+          <Text style={styles.help}>
+            Slacker requires a Slack Token.
+            </Text>
+          <Text style={styles.help}>
+            To get a token
+            <Text
+              style={styles.link}
+              onPress={() => Linking.openURL('https://github.com/erroneousboat/slack-term/')}> click here
+         </Text>.
+          </Text>
+        </View>
       </>
     );
   }
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    margin: 20,
+    justifyContent: 'center',
 
+  },
+  header: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 90,
+    height: 90,
+  },
+  title: {
+    fontSize: 20,
+    textAlign: 'center',
+  },
+  button: {
+    width: 100,
+    margin: 20,
+  },
+  spacer: {
+    paddingTop: 20,
+  },
+  link: {
+    color: 'blue',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+  }
+});
 
 export default App;
