@@ -1,5 +1,4 @@
 import BackgroundJob from 'react-native-background-actions';
-console.log('xxssx', net);
 
 const sleep = time => new Promise(resolve => setTimeout(() => resolve(), time));
 
