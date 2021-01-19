@@ -1,4 +1,5 @@
-![logo](/icon.png =250x)
+<img src="icon.png" alt="logo" width="200"/>
+
 
 Slacker
 =======
