@@ -1,33 +1,34 @@
 import BackgroundJob from 'react-native-background-actions';
+import SlackerBot from './SlackerBot';
 
-const sleep = time => new Promise(resolve => setTimeout(() => resolve(), time));
 
-export const taskOptions = {
-  taskName: 'Slacker',
-  taskTitle: 'Slacker',
-  taskDesc: 'Slacker',
-  taskIcon: {
-    name: 'ic_launcher',
-    type: 'mipmap',
-  },
-  color: '#ff00ff',
-  linkingURI: 'slackBotOn://open/service',
-  parameters: {
-    delay: 1000,
-  },
-};
+const notify = async (taskTitle, taskDesc = '') => {
+  console.log('Notification: ', taskTitle, taskDesc);
+  if (BackgroundJob.isRunning()) {
+    await BackgroundJob.updateNotification({ taskTitle, taskDesc });
+  }
+}
 
-export const task = async taskData => {
-  await new Promise(async resolve => {
-    /*
-    const { delay } = taskData;
-    for (let i = 0; BackgroundJob.isRunning(); i++) {
-      const taskDesc = 'x' + i;
-      await BackgroundJob.updateNotification({ taskDesc });
-      console.log(slack);
-      await sleep(delay);
-    }
-    */
+const heartBeatDelay = 500;
+
+export default backgroundTask = async taskData => {
+  await new Promise(async (resolve, reject) => {
+    let slackerBot = new SlackerBot(taskData.token, true, 1000, notify);
+    slackerBot.connect();
+
+    //FIXME: Find a way to free resources
+    let timeoutId;
+    const heartBeat = () => {
+      clearTimeout(timeoutId);
+      if (BackgroundJob.isRunning()) {
+        timeoutId = setTimeout(heartBeat, heartBeatDelay);
+      } else {
+        slackerBot.disconnect();
+        slackerBot = null;
+      }
+    };
+    heartBeat();
+
   });
+  console.log('done');
 };
-
