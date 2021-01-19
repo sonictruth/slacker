@@ -1,0 +1,32 @@
+{
+  "name": "slacker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "test": "jest",
+    "lint": "eslint .",
+    "pods": "cd ios && pod install"
+  },
+  "dependencies": {
+    "querystring": "^0.2.0",
+    "react": "16.9.0",
+    "react-native": "0.61.5",
+    "react-native-background-actions": "^2.4.0",
+    "slack": "^11.0.2",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/runtime": "^7.8.3",
+    "@react-native-community/eslint-config": "^0.0.6",
+    "babel-jest": "^24.9.0",
+    "eslint": "^6.8.0",
+    "jest": "^24.9.0",
+    "metro-react-native-babel-preset": "^0.56.4",
+    "react-test-renderer": "16.9.0"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
