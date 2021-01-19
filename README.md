@@ -1,4 +1,4 @@
-![Logo](/icon.png?raw=true)
+![logo](/icon.png =250x)
 
 Slacker
 =======
@@ -15,6 +15,6 @@ or check our [releases](https://github.com/sonictruth/slacker/releases)
 ## Usage
 
 Slacker can use the same token as [slack-term](https://github.com/erroneousboat/slack-term).
-Click [here](https://github.com/erroneousboat/slack-term/wiki#running-slack-term-without-legacy-tokens) to get one
+Click [here](https://github.com/erroneousboat/slack-term/wiki#running-slack-term-without-legacy-tokens) to get one.
 
 
