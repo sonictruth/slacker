@@ -13,7 +13,8 @@ const heartBeatDelay = 500;
 
 export default backgroundTask = async taskData => {
   await new Promise(async (resolve, reject) => {
-    let slackerBot = new SlackerBot(taskData.token, true, 1000, notify);
+    console.log(taskData);
+    let slackerBot = new SlackerBot(taskData.token, taskData.showTyping, 1000, notify);
     slackerBot.connect();
 
     //FIXME: Find a way to free resources

@@ -3,15 +3,20 @@ import React from 'react';
 import {
   ScrollView,
   View,
-  Text,
   Image,
-  Button,
   StyleSheet,
   Linking,
-  TextInput,
   Switch
 } from 'react-native';
 
+import {
+  CheckBox,
+  Divider,
+  Text,
+  Input,
+  Button
+} from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import BackgroundJob from 'react-native-background-actions';
 import backgroundTask from './backgroundTask';
@@ -71,6 +76,7 @@ class App extends React.Component {
   getBackgroundTaskOptions() {
     return {
       parameters: {
+        showTyping: this.getSetting('showTyping'),
         token: this.getSetting('token')
       },
       ...backgroundTaskDefaultOptions
@@ -94,63 +100,24 @@ class App extends React.Component {
   render() {
     return (
       <>
+
         { !this.state.settingsLoaded ? <></> :
           <ScrollView style={styles.container}>
             <View style={styles.header}>
-              <Image
-                style={styles.logo}
-                source={require('../icon.png')}
-              />
-              <Text style={styles.title}>
-                Slacker
-              </Text>
+              <View  >
+                <Image
+                  style={styles.logo}
+                  source={require('../icon.png')}
+                />
+              </View>
+              <View  >
+                <Text h1>Slacker</Text>
+              </View>
             </View>
 
-            <View style={styles.spacer} />
-            <Text>
-              Slack Token:
-             </Text>
-            <TextInput
-              editable={!this.state.serviceRunning}
-              placeholder={'Slack Token'}
-              textContentType={'password'}
-              secureTextEntry={true}
-              autoCorrect={false}
-              style={styles.input}
-              value={this.getSetting('token')}
-              onChangeText={
-                token => this.updateSetting('token', token)
-              }
-            />
-            <Text>Show typing:</Text>
-            <View style={styles.switchContainer}>
-              <Switch
-                style={{ display: 'flex', flex: 0.1 }}
-                disabled={this.state.serviceRunning}
-                onValueChange={
-                  () => this.updateSetting('showTyping', !this.getSetting('showTyping'))
-                }
-                value={this.getSetting('showTyping')}
-              />
-              <Text style={{ display: 'flex', flex: 0.1 }}>xx</Text>
-            </View>
+            <Divider />
 
-            <View style={styles.spacer} />
-
-            <Button
-              style={styles.button}
-              onPress={this.toggleBackground}
-              title={this.state.serviceRunning ? 'Stop' : 'Start'}
-              accessibilityLabel="Start Slacker service"
-            />
-
-            <View style={styles.spacer} />
-
-            <Text style={styles.help}>
-              After you start Slacker, see notification area for updates.
-            </Text>
-
-            <View style={styles.spacer} />
+            <Divider style={styles.divider} />
 
             <Text style={styles.help}>
               Use one of the methods described
@@ -159,6 +126,56 @@ class App extends React.Component {
                 onPress={() => Linking.openURL(tokenHelpLink)}> here </Text>
                 to get a Token.
               </Text>
+
+            <Divider style={styles.divider} />
+
+            <Input
+              disabled={this.state.serviceRunning}
+              placeholder={'Paste Slack Token Here'}
+              textContentType={'password'}
+              secureTextEntry={true}
+              autoCorrect={false}
+              value={this.getSetting('token')}
+              onChangeText={
+                token => this.updateSetting('token', token)
+              }
+              leftIcon={
+                <Icon
+                  name='lock'
+                  size={24}
+                  color='black'
+                />
+              }
+            />
+
+            <CheckBox
+              title={`Show 'Typing' on mentions or private messages`}
+              checked={this.getSetting('showTyping')}
+              onPress={() => this.updateSetting('showTyping', !this.getSetting('showTyping'))}
+            />
+
+            <Divider style={styles.divider} />
+
+            <Button
+              disabled={this.getSetting('token') === ''}
+              style={styles.button}
+              onPress={this.toggleBackground}
+              title={
+                this.state.serviceRunning ? ' Stop' : ' Start'
+              }
+              icon={
+                <Icon
+                  name={this.state.serviceRunning ? 'stop' : 'play'}
+                  color='white'
+                />}
+            />
+
+            <Divider style={styles.divider} />
+
+            <Text style={styles.help}>
+              After you start Slacker, check notification area for updates.
+            </Text>
+
 
           </ScrollView>
         }
@@ -169,16 +186,18 @@ class App extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    margin: 20,
+    display: 'flex',
+    margin: 10,
   },
   header: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
   },
   logo: {
-    width: 90,
-    height: 90,
+    width: 70,
+    height: 50,
   },
   title: {
     fontSize: 20,
@@ -188,23 +207,13 @@ const styles = StyleSheet.create({
     width: 100,
     margin: 20,
   },
-  spacer: {
-    paddingTop: 20,
+  divider: {
+    backgroundColor: 'transparent',
+    margin: 10,
   },
   link: {
     color: 'blue',
   },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-  },
-  switchContainer: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'center'
-  }
 });
 
 
