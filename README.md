@@ -24,7 +24,7 @@ npm i; npm run android:build;
 ```
 ## Install
 
-Enable 'Unknown Sources', then install apk from [Releases](https://github.com/sonictruth/slacker/releases).
+Enable 'Unknown Sources' then install apk from [Releases (Assets)](https://github.com/sonictruth/slacker/releases).
 ## Usage
 
 Slacker can use the same token as [slack-term](https://github.com/erroneousboat/slack-term).
