@@ -6,7 +6,6 @@ import {
   Image,
   StyleSheet,
   Linking,
-  Switch
 } from 'react-native';
 
 import {
@@ -14,14 +13,15 @@ import {
   Divider,
   Text,
   Input,
-  Button
+  Button,
 } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
+import Icon from 'react-native-vector-icons/FontAwesome';
 import BackgroundJob from 'react-native-background-actions';
+import RNSecureStorage, { ACCESSIBLE } from 'rn-secure-storage';
+
 import backgroundTask from './backgroundTask';
 import backgroundTaskDefaultOptions from './backgroundTaskDefaultOptions';
-import RNSecureStorage, { ACCESSIBLE } from 'rn-secure-storage';
 
 const settingPrefix = 'setting_';
 const tokenHelpLink = 'https://github.com/erroneousboat/slack-term/wiki#running-slack-term-without-legacy-tokens';
@@ -100,7 +100,6 @@ class App extends React.Component {
   render() {
     return (
       <>
-
         { !this.state.settingsLoaded ? <></> :
           <ScrollView style={styles.container}>
             <View style={styles.header}>
@@ -119,7 +118,7 @@ class App extends React.Component {
 
             <Divider style={styles.divider} />
 
-            <Text style={styles.help}>
+            <Text>
               Use one of the methods described
               <Text
                 style={styles.link}
@@ -172,7 +171,7 @@ class App extends React.Component {
 
             <Divider style={styles.divider} />
 
-            <Text style={styles.help}>
+            <Text>
               After you start Slacker, check notification area for updates.
             </Text>
 

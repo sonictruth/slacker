@@ -4,6 +4,8 @@
 Slacker
 =======
 
+<img src="screen.gif" alt="logo" width="300"/>
+
 React Native Android application that uses a background job to keep your slack presence active.
 You also have the option to send 'User is typing' when you get a private message or you are mentioned in a channel.
 
