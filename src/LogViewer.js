@@ -68,11 +68,10 @@ async function handleItemPress(item) {
   if (logType === logTypes.NOTIFICATION) {
     const notification = item.data[2];
     const channel = notification.channel;
-    const content = notification.content;
     const launchUri = notification.launchUri;
     const supported = await Linking.canOpenURL(launchUri);
     if (supported) {
-      await Linking.openURL(url);
+      await Linking.openURL(launchUri);
     } else {
       await Linking.openURL(`https://slack.com/app_redirect?channel=${channel}`);
     }  
