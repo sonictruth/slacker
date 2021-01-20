@@ -6,8 +6,11 @@ Slacker
 
 <img src="screen.gif" alt="logo" width="300"/>
 
-React Native Android application that uses a background job to keep your slack presence active.
-You also have the option to send 'User is typing' when you get a private message or you are mentioned in a channel.
+React Native Android application that uses a background task to keep your slack presence active.
+
+### Features:
+- Send fake 'User is typing' when you get a private message or you are mentioned in a channel.
+- Pressing on a message from the log viewer will open the message channel in Slack client or Slack Web client.
 
 ## Development
 
