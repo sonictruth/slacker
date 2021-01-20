@@ -5,7 +5,7 @@
   "scripts": {
     "android": "react-native run-android",
     "android:clean": "cd android && ./gradlew clean && cd ../",
-    "android:build": "cd android && ./gradlew bundleRelease && cd ../",
+    "android:build": "cd android && ./gradlew build && cd ../",
     "test": "jest",
     "lint": "eslint .",
     "pods": "cd ios && pod install"

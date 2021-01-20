@@ -7,6 +7,6 @@ export default backgroundTaskDefaultOptions = {
     type: 'mipmap',
   },
   color: '#ff00ff',
-  linkingURI: 'slackBotOn://open/service'
+  linkingURI: 'slacker://open/service'
 };
 
