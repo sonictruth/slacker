@@ -1,4 +1,5 @@
 import Slack from 'slack';
+import logTypes from './logTypes';
 
 class SlackerBot {
   constructor(
@@ -16,7 +17,7 @@ class SlackerBot {
     this.reconnectTimerId = null;
     this.init();
   }
-  
+
   init() {
     this.webClient = null;
     this.rtmClient = null;
@@ -33,13 +34,19 @@ class SlackerBot {
     clearTimeout(this.typingDelayTimerId);
     if (this.isRtmConnected()) {
       this.rtmClient.close();
-      this.loggerFn('Disconnecting socket', 'Please wait...');
+      this.loggerFn(
+        logTypes.DISCONNECTING,
+        'Closing Socket connection...'
+      );
     }
     this.init();
   }
 
   connect() {
-    this.loggerFn('Connecting', 'Please wait...');
+    this.loggerFn(
+      logTypes.CONNECTING,
+      'Connecting to Slack...'
+    );
     this.webClient = new Slack({ token: this.token });
     return this.webClient.rtm.connect()
       .then(response => {
@@ -58,7 +65,10 @@ class SlackerBot {
         this.users = usersData.members;
         this.channels = channelsData.channels;
         this.rtmClient = new WebSocket(this.wsUrl);
-        this.loggerFn('Connecting Socket', 'Please wait...');
+        this.loggerFn(
+          logTypes.CONNECTING,
+          'Connecting Socket...'
+        );
         this.rtmClient.onerror = this._handleError.bind(this);
         this.rtmClient.onmessage = this._handleIncomingRtmMessage.bind(this);
         this.rtmClient.onclose = this.init.bind(this);
@@ -98,9 +108,12 @@ class SlackerBot {
   }
 
   _handleError(error, isSocketError) {
-    console.log(error, isSocketError);
     const message = error ? error.message : 'Unknown';
-    this.loggerFn('Error', `${message}. Retrying to connect... `);
+    this.loggerFn(
+      logTypes.ERROR,
+      `${message}. Retrying to connect... `,
+      error
+    );
     this.disconnect();
     this.reconnectTimerId = setTimeout(() => this.connect(), this.reconnectDelay);
   }
@@ -109,7 +122,11 @@ class SlackerBot {
     const parsedMessage = JSON.parse(message.data);
     switch (parsedMessage.type) {
       case 'hello':
-        this.loggerFn('Connected', `Host: ${parsedMessage.host_id} Region:${parsedMessage.region}`);
+        this.loggerFn(
+          logTypes.CONNECTED,
+          `Host: ${parsedMessage.host_id} Region:${parsedMessage.region}`,
+          parsedMessage
+        );
         this.connected = true;
         break;
       case 'message':
@@ -121,13 +138,17 @@ class SlackerBot {
     }
   }
 
-  _handleNotification(message) {
-    if (message.channel) {
-      this.loggerFn(`Incoming message on: ${message.title}`, `<${message.subtitle}> ${message.content}`);
+  _handleNotification(notification) {
+    if (notification.channel) {
+      this.loggerFn(
+        logTypes.NOTIFICATION,
+        `<${notification.subtitle}> ${notification.content}`,
+        notification
+      );
       if (this.showTyping) {
         clearTimeout(this.typingDelayTimerId);
         this.typingDelayTimerId =
-          setTimeout(() => this.sendTyping(message.channel), this.typingDelayMs);
+          setTimeout(() => this.sendTyping(notification.channel), this.typingDelayMs);
       }
     }
   }

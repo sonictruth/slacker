@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {
-  ScrollView,
   View,
   Image,
   StyleSheet,
@@ -23,6 +22,9 @@ import RNSecureStorage, { ACCESSIBLE } from 'rn-secure-storage';
 import backgroundTask from './backgroundTask';
 import backgroundTaskDefaultOptions from './backgroundTaskDefaultOptions';
 
+import logger from './logger';
+import LogViewer from './LogViewer';
+
 const settingPrefix = 'setting_';
 const tokenHelpLink = 'https://github.com/erroneousboat/slack-term/wiki#running-slack-term-without-legacy-tokens';
 class App extends React.Component {
@@ -30,8 +32,9 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      serviceRunning: BackgroundJob.isRunning(),
-      settingsLoaded: false
+      isServiceRunning: BackgroundJob.isRunning(),
+      settingsLoaded: false,
+      logs: [],
     };
     this.state[`${settingPrefix}token`] = '';
     this.state[`${settingPrefix}showTyping`] = true;
@@ -39,7 +42,18 @@ class App extends React.Component {
 
   async componentDidMount() {
     await this.loadSettings();
-    this.setState({ settingsLoaded: true });
+    this.setState({
+      logs: logger.getLogs(),
+      settingsLoaded: true
+    });
+
+    logger.addLogListener(this._handleNewLog.bind(this));
+  }
+
+  _handleNewLog() {
+    this.setState({
+      logs: logger.getLogs()
+    });
   }
 
   async loadSettings() {
@@ -84,7 +98,7 @@ class App extends React.Component {
   }
 
   toggleBackground = async () => {
-    if (!this.state.serviceRunning) {
+    if (!this.state.isServiceRunning) {
       await BackgroundJob.start(
         backgroundTask,
         this.getBackgroundTaskOptions()
@@ -93,90 +107,100 @@ class App extends React.Component {
       await BackgroundJob.stop();
     }
     this.setState({
-      serviceRunning: BackgroundJob.isRunning()
+      isServiceRunning: BackgroundJob.isRunning()
     });
+
   };
 
   render() {
     return (
       <>
-        { !this.state.settingsLoaded ? <></> :
-          <ScrollView style={styles.container}>
-            <View style={styles.header}>
-              <View  >
-                <Image
-                  style={styles.logo}
-                  source={require('../icon.png')}
-                />
+        { this.state.settingsLoaded &&
+          <View style={styles.container}>
+            <View style={styles.main}>
+
+              <View style={styles.header}>
+                <View  >
+                  <Image
+                    style={styles.logo}
+                    source={require('../icon.png')}
+                  />
+                </View>
+                <View  >
+                  <Text h1>Slacker</Text>
+                </View>
               </View>
-              <View  >
-                <Text h1>Slacker</Text>
-              </View>
-            </View>
 
-            <Divider />
+              <Divider />
 
-            <Divider style={styles.divider} />
+              <Divider style={styles.divider} />
 
-            <Text>
-              Use one of the methods described
+              <Text>
+                Use one of the methods described
               <Text
-                style={styles.link}
-                onPress={() => Linking.openURL(tokenHelpLink)}> here </Text>
+                  style={styles.link}
+                  onPress={() => Linking.openURL(tokenHelpLink)}> here </Text>
                 to get a Token.
               </Text>
 
-            <Divider style={styles.divider} />
+              <Divider style={styles.divider} />
 
-            <Input
-              disabled={this.state.serviceRunning}
-              placeholder={'Paste Slack Token Here'}
-              textContentType={'password'}
-              secureTextEntry={true}
-              autoCorrect={false}
-              value={this.getSetting('token')}
-              onChangeText={
-                token => this.updateSetting('token', token)
-              }
-              leftIcon={
-                <Icon
-                  name='lock'
-                  size={24}
-                  color='black'
+              <View style={{ opacity: this.state.isServiceRunning ? .5 : 1 }}>
+                <Input
+                  disabled={this.state.isServiceRunning}
+                  placeholder={'Paste Slack Token Here'}
+                  textContentType={'password'}
+                  secureTextEntry={true}
+                  autoCorrect={false}
+                  value={this.getSetting('token')}
+                  onChangeText={
+                    token => this.updateSetting('token', token)
+                  }
+                  leftIcon={
+                    <Icon
+                      name='lock'
+                      size={24}
+                      color='black'
+                    />
+                  }
                 />
+
+                <CheckBox
+                  title={`Show 'Typing' on mentions or private messages`}
+                  checked={this.getSetting('showTyping')}
+                  onPress={
+                    this.state.isServiceRunning ? null :
+                      () => this.updateSetting('showTyping', !this.getSetting('showTyping'))
+                  }
+                />
+              </View>
+
+              <Divider style={styles.divider} />
+
+              <Button
+                disabled={this.getSetting('token') === ''}
+                style={styles.button}
+                onPress={this.toggleBackground}
+                title={
+                  this.state.isServiceRunning ? ' Stop' : ' Start'
+                }
+                icon={
+                  <Icon
+                    name={this.state.isServiceRunning ? 'stop' : 'play'}
+                    color='white'
+                  />}
+              />
+
+              <Divider style={styles.divider} />
+
+            </View>
+
+            <View style={styles.logs}>
+              {
+                this.state.logs.length > 0 && <LogViewer data={this.state.logs} />
               }
-            />
-
-            <CheckBox
-              title={`Show 'Typing' on mentions or private messages`}
-              checked={this.getSetting('showTyping')}
-              onPress={() => this.updateSetting('showTyping', !this.getSetting('showTyping'))}
-            />
-
-            <Divider style={styles.divider} />
-
-            <Button
-              disabled={this.getSetting('token') === ''}
-              style={styles.button}
-              onPress={this.toggleBackground}
-              title={
-                this.state.serviceRunning ? ' Stop' : ' Start'
-              }
-              icon={
-                <Icon
-                  name={this.state.serviceRunning ? 'stop' : 'play'}
-                  color='white'
-                />}
-            />
-
-            <Divider style={styles.divider} />
-
-            <Text>
-              After you start Slacker, check notification area for updates.
-            </Text>
-
-
-          </ScrollView>
+            </View>
+          </View>
         }
       </>
     );
@@ -185,11 +209,16 @@ class App extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
+    flex: 1,
     margin: 10,
   },
-  header: {
+  main: {
     flex: 1,
+  },
+  logs: {
+    flex: 1,
+  },
+  header: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center'
