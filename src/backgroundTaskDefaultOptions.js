@@ -9,3 +9,4 @@ export default backgroundTaskDefaultOptions = {
   color: '#ff00ff',
   linkingURI: 'slackBotOn://open/service'
 };
+

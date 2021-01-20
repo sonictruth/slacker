@@ -13,7 +13,7 @@ const heartBeatDelay = 500;
 
 export default backgroundTask = async taskData => {
   await new Promise(async (resolve, reject) => {
-    console.log(taskData);
+
     let slackerBot = new SlackerBot(taskData.token, taskData.showTyping, 1000, notify);
     slackerBot.connect();
 
@@ -29,7 +29,5 @@ export default backgroundTask = async taskData => {
       }
     };
     heartBeat();
-
   });
-  console.log('done');
 };
